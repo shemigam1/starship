@@ -64,17 +64,19 @@ a {
   font-family: var(--mono);
 }
 
+/* Links are unmistakable: an orange underline that turns the text orange on hover. */
 .link {
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--fg) 35%, transparent);
-  text-decoration-thickness: 1px;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 1.5px;
   text-underline-offset: 5px;
-  transition: text-decoration-color 0.15s, opacity 0.15s;
+  transition: color 0.15s, opacity 0.15s;
 }
 
 .link:hover,
 .link:focus-visible {
-  text-decoration-color: var(--fg);
+  color: var(--accent);
+  opacity: 1 !important;
   outline: none;
 }
 

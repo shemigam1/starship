@@ -3,13 +3,15 @@ import { bio, site, socials } from "../data/site";
 ---
 
 <header class="hero" id="top">
-  <canvas class="sky mono" data-starfield aria-hidden="true"></canvas>
+  <img
+    class="painting"
+    src="/hero/creation-of-adam.webp"
+    srcset="/hero/creation-of-adam-960.webp 960w, /hero/creation-of-adam.webp 1920w"
+    sizes="100vw"
+    alt="Michelangelo's The Creation of Adam: God reaching out to touch Adam's hand"
+    fetchpriority="high"
+  />
   <div class="shade" aria-hidden="true"></div>
-
-  <div class="stats mono" aria-hidden="true">
-    <div><span data-stat="ships">0</span> ships</div>
-    <div><span data-stat="warps">0</span> warps</div>
-  </div>
 
   <div class="copy">
     <blockquote class="quote mono" aria-label={site.quote.join(" ")}>
@@ -24,7 +26,12 @@ import { bio, site, socials } from "../data/site";
               typeof part === "string" ? (
                 part
               ) : part.href ? (
-                <a class="link" href={part.href} target="_blank" rel="noopener noreferrer">
+                <a
+                  class="link"
+                  href={part.href}
+                  target={part.href.startsWith("http") ? "_blank" : undefined}
+                  rel="noopener noreferrer"
+                >
                   {part.label}
                 </a>
               ) : (
@@ -50,7 +57,7 @@ import { bio, site, socials } from "../data/site";
     </p>
   </div>
 
-  <p class="hint mono" aria-hidden="true">click anywhere in the sky to warp</p>
+  <p class="credit mono">Michelangelo, <i>The Creation of Adam</i>, c. 1512</p>
 </header>
 
 <style>
@@ -60,35 +67,31 @@ import { bio, site, socials } from "../data/site";
     min-height: 560px;
     overflow: hidden;
   }
-  .sky {
+  /* The fresco fills the hero, framed on the hands. */
+  /*
+   * The fresco is sized past the hero and anchored on the point where the two
+   * fingers meet (38.5% across, 45% down the painting), so the touch always
+   * lands at the horizontal centre.
+   */
+  .painting {
+    --hero-h: max(100svh, 560px);
     position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-    cursor: crosshair;
+    left: 50%;
+    top: 40%;
+    width: max(135%, calc(var(--hero-h) * 2.204 * 1.12));
+    max-width: none;
+    height: auto;
+    transform: translate(-38.5%, -45%);
   }
-  /* Keeps the copy legible where ships pass behind it. */
+  /* Fades the painting into the page so the nav and copy stay legible. */
   .shade {
     position: absolute;
-    inset: auto 0 0 0;
-    height: 55%;
+    inset: 0;
     pointer-events: none;
-    background: linear-gradient(to top, var(--bg) 8%, color-mix(in srgb, var(--bg) 70%, transparent) 45%, transparent);
-  }
-  .stats {
-    position: absolute;
-    top: 72px;
-    right: var(--gutter);
-    font-size: 11px;
-    line-height: 1.7;
-    text-align: right;
-    font-variant-numeric: tabular-nums;
-    color: var(--faint);
-    pointer-events: none;
-  }
-  [data-stat="warps"].flash {
-    color: var(--accent);
+    background:
+      linear-gradient(to bottom, color-mix(in srgb, var(--bg) 75%, transparent), transparent 16%),
+      linear-gradient(to top, var(--bg) 4%, color-mix(in srgb, var(--bg) 88%, transparent) 34%, color-mix(in srgb, var(--bg) 25%, transparent) 62%, transparent 80%),
+      linear-gradient(to right, color-mix(in srgb, var(--bg) 55%, transparent), transparent 45%);
   }
   .copy {
     position: absolute;
@@ -132,7 +135,10 @@ import { bio, site, socials } from "../data/site";
     line-height: 1.75;
   }
   .bio p {
-    margin: 0;
+    margin: 0 0 1.1em;
+  }
+  .bio p:last-child {
+    margin-bottom: 0;
   }
   .socials {
     margin: 0;
@@ -147,14 +153,13 @@ import { bio, site, socials } from "../data/site";
   .sep {
     opacity: 0.4;
   }
-  .hint {
+  .credit {
     position: absolute;
     right: var(--gutter);
     bottom: 24px;
     margin: 0;
     font-size: 11px;
     color: var(--faint);
-    pointer-events: none;
   }
   @media (max-width: 760px) {
     .copy {
@@ -165,7 +170,14 @@ import { bio, site, socials } from "../data/site";
     .quote {
       font-size: 13px;
     }
-    .hint {
+    /* Portrait screens: keep the painting in the top half so the hands sit above the copy. */
+    .painting {
+      top: 27%;
+      width: calc(var(--hero-h) * 0.6 * 2.204);
+      mask-image: linear-gradient(to bottom, #000 64%, transparent 92%);
+      -webkit-mask-image: linear-gradient(to bottom, #000 64%, transparent 92%);
+    }
+    .credit {
       left: var(--gutter);
       right: auto;
     }
@@ -173,25 +185,7 @@ import { bio, site, socials } from "../data/site";
 </style>
 
 <script>
-  import { Starfield } from "../lib/starfield/engine";
   import { site } from "../data/site";
-
-  const canvas = document.querySelector<HTMLCanvasElement>("[data-starfield]")!;
-  const ships = document.querySelector<HTMLElement>('[data-stat="ships"]')!;
-  const warps = document.querySelector<HTMLElement>('[data-stat="warps"]')!;
-  let lastWarps = 0;
-
-  const field = new Starfield(canvas, (s) => {
-    ships.textContent = String(s.ships);
-    warps.textContent = String(s.warps);
-    // Flash the warp count when it changes, tying the click to the number.
-    if (s.warps !== lastWarps) {
-      lastWarps = s.warps;
-      warps.classList.add("flash");
-      setTimeout(() => warps.classList.remove("flash"), 500);
-    }
-  });
-  window.addEventListener("themechange", () => field.readPalette());
 
   // Typewriter for the quote.
   const typed = document.querySelector<HTMLElement>("[data-typed]")!;

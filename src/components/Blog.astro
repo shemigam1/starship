@@ -1,0 +1,122 @@
+---
+import { writing } from "../data/site";
+---
+
+<section class="section" id="blog" style="--dot: var(--accent)">
+  <aside class="section-aside">
+    <h2 class="section-label">Writing</h2>
+    <p class="section-blurb">{writing.blurb}</p>
+    <a class="link mono all" href={writing.href} target="_blank" rel="noopener noreferrer">
+      Read {writing.name} on Substack ↗
+    </a>
+  </aside>
+
+  <ul class="posts">
+    {
+      writing.posts.map((post) => (
+        <li>
+          <a class="post" href={post.href} target="_blank" rel="noopener noreferrer">
+            <div class="meta mono">
+              <span class="series">{post.series}</span>
+              <span>
+                {post.date} · {post.minutes} min read
+              </span>
+            </div>
+            <h3>
+              <span class="title">{post.title}</span> <span class="ext" aria-hidden="true">↗</span>
+            </h3>
+            <p>{post.dek}</p>
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .all {
+    font-size: 12px;
+    margin-top: 4px;
+    align-self: flex-start;
+  }
+  .posts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .post {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+    padding: 22px 22px 24px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 0.2s,
+      transform 0.3s var(--ease);
+  }
+  .post:hover,
+  .post:focus-visible {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    outline: none;
+  }
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .series {
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  h3 {
+    margin: 0;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+  /* Titles read as links: orange underline, arrow, orange on hover. */
+  .title {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 4px;
+    transition: color 0.15s;
+  }
+  .ext {
+    display: inline-block;
+    color: var(--accent);
+    font-weight: 700;
+    transition: transform 0.2s var(--ease);
+  }
+  .post:hover .title,
+  .post:focus-visible .title {
+    color: var(--accent);
+  }
+  .post:hover .ext,
+  .post:focus-visible .ext {
+    transform: translate(2px, -2px);
+  }
+  p {
+    margin: 0;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: color-mix(in srgb, var(--fg) 75%, transparent);
+  }
+  @media (max-width: 640px) {
+    .posts {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

@@ -19,8 +19,8 @@ featured projects, playground, archive rows and footer badges. Give a project an
 | Section | File |
 | --- | --- |
 | Nav + light/dark toggle | `src/components/Nav.astro` |
-| ASCII starfield hero | `src/components/Hero.astro`, `src/lib/starfield/` |
-| Featured projects | `src/components/Featured.astro`, `src/lib/ascii-cover.ts` |
+| Hero with *The Creation of Adam* | `src/components/Hero.astro`, `public/hero/` |
+| Featured projects over the ASCII starfield | `src/components/Featured.astro`, `src/lib/starfield/` |
 | Playground | `src/components/Playground.astro` |
 | Archive with tag filter | `src/components/Archive.astro` |
 | Badge physics, tic-tac-toe, email | `src/components/Footer.astro`, `src/lib/nudge.ts`, `src/lib/tictactoe.ts` |
@@ -30,5 +30,7 @@ featured projects, playground, archive rows and footer badges. Give a project an
 - Hero layout, typewriter quote and canvas-behind-the-bio idea from [daoho.dev](https://www.daoho.dev/).
 - Starfield loop, cell grid and wake diffusion adapted from
   [ascii-sharks](https://github.com/stackedlol/ascii-sharks) (MIT, © 2026 drewdi).
+- Hero painting: Michelangelo, *The Creation of Adam* (c. 1512), public domain, via
+  [Wikimedia Commons](https://commons.wikimedia.org/wiki/File:Michelangelo_-_Creation_of_Adam_(cropped).jpg).
 - Section structure, archive, playground and footer arcade inspired by
   [ajanwachuku.work](https://www.ajanwachuku.work/).

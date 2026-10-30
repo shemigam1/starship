@@ -1,0 +1,126 @@
+---
+import { logos } from "../data/site";
+// Each row holds the set twice so it's wider than a large screen, and two
+// rows let the loop wrap seamlessly at -50%. Only the first set is announced.
+const rows = [0, 1];
+const items = [...logos, ...logos].map((l, i) => ({ ...l, dup: i >= logos.length }));
+---
+
+<section class="strip" aria-label="Places I've built with">
+  <div class="track">
+    {
+      rows.map((copy) => (
+        <ul class="row" aria-hidden={copy === 1 ? "true" : undefined}>
+          {items.map((l) => {
+            const Tag = l.href ? "a" : "span";
+            return (
+              <li aria-hidden={l.dup ? "true" : undefined}>
+                <Tag
+                  class="logo"
+                  href={l.href}
+                  target={l.href ? "_blank" : undefined}
+                  rel={l.href ? "noopener noreferrer" : undefined}
+                  tabindex={copy === 1 || l.dup ? -1 : undefined}
+                  aria-label={l.name}
+                  title={l.name}
+                >
+                  <span class="mark" style={`--src: url(${l.src}); --ratio: ${l.ratio}; --scale: ${l.scale ?? 1}`} />
+                  {l.text && <span class="text">{l.text}</span>}
+                </Tag>
+              </li>
+            );
+          })}
+        </ul>
+      ))
+    }
+  </div>
+</section>
+
+<style>
+  .strip {
+    --h: 30px;
+    position: relative;
+    overflow: hidden;
+    border-top: 1px solid var(--line);
+    padding: 34px 0;
+    mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 12%, #000 88%, transparent);
+  }
+  .track {
+    display: flex;
+    width: max-content;
+    animation: scroll 48s linear infinite;
+  }
+  .strip:hover .track {
+    animation-play-state: paused;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 96px;
+    margin: 0;
+    padding: 0 48px;
+    list-style: none;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--fg);
+    opacity: 0.7;
+    text-decoration: none;
+    transition: opacity 0.2s;
+  }
+  .logo:hover,
+  .logo:focus-visible {
+    opacity: 1;
+    outline: none;
+  }
+  .mark {
+    display: block;
+    height: calc(var(--h) * var(--scale));
+    width: calc(var(--h) * var(--scale) * var(--ratio));
+    margin-block: calc(var(--h) * (1 - var(--scale)) / 2);
+    background: currentColor;
+    mask: var(--src) center / contain no-repeat;
+    -webkit-mask: var(--src) center / contain no-repeat;
+  }
+  .text {
+    font-size: 21px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  @keyframes scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (max-width: 640px) {
+    .strip {
+      --h: 22px;
+      padding: 24px 0;
+    }
+    .row {
+      gap: 56px;
+      padding: 0 28px;
+    }
+    .text {
+      font-size: 16px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .track {
+      animation: none;
+      width: auto;
+      justify-content: center;
+    }
+    .row:nth-child(2) {
+      display: none;
+    }
+    .row {
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 24px;
+    }
+  }
+</style>

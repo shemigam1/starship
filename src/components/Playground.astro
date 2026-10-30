@@ -1,5 +1,12 @@
 ---
-import { playground } from "../data/site";
+const art = [
+  "  .        *               .         +    ",
+  "      +          __                       ",
+  "             ___/  \\___         .         ",
+  "  .     ====[   ....   ]====>         *   ",
+  "             ---\\__/---                   ",
+  "     *                    .        .      ",
+];
 ---
 
 <section class="section" id="playground" style="--dot: var(--pink)">
@@ -10,93 +17,77 @@ import { playground } from "../data/site";
     </p>
   </aside>
 
-  <div class="items">
-    {
-      playground.map((p, i) => (
-        <article class="item">
-          <a class="art" href={p.href} style={`--tone: var(${i % 2 ? "--pink" : "--accent"})`} aria-label={p.cta}>
-            <pre class="mono" aria-hidden="true">{p.art.join("\n")}</pre>
-          </a>
-          <h3>{p.name}</h3>
-          <p>{p.blurb}</p>
-          <a class="cta mono" href={p.href}>
-            {p.cta} <span aria-hidden="true">↗</span>
-          </a>
-        </article>
-      ))
-    }
+  <div class="soon">
+    <pre class="art mono" aria-hidden="true">{art.join("\n")}</pre>
+    <p class="title mono">coming soon<span class="cursor" aria-hidden="true"></span></p>
+    <p class="sub">The experiments are still in the hangar. Check back soon.</p>
   </div>
 </section>
 
 <style>
-  .items {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px 24px;
-    max-width: 980px;
-  }
-  .item {
+  .soon {
+    --tone: var(--pink);
     display: flex;
     flex-direction: column;
-    gap: 8px;
-  }
-  .art {
-    display: grid;
-    place-items: center;
-    aspect-ratio: 16 / 10;
-    margin-bottom: 8px;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    max-width: 980px;
+    min-height: 300px;
+    padding: 48px 24px;
     border-radius: 6px;
+    border-top: 2px solid var(--tone);
+    text-align: center;
     background:
       repeating-linear-gradient(0deg, transparent 0 23px, color-mix(in srgb, var(--tone) 18%, transparent) 23px 24px),
       repeating-linear-gradient(90deg, transparent 0 23px, color-mix(in srgb, var(--tone) 18%, transparent) 23px 24px),
       color-mix(in srgb, var(--tone) 9%, var(--card));
-    border-top: 2px solid var(--tone);
-    color: var(--tone);
-    text-decoration: none;
-    overflow: hidden;
   }
-  pre {
-    margin: 0;
-    font-size: clamp(11px, 1.7vw, 22px);
+  .art {
+    margin: 0 0 8px;
+    font-size: clamp(10px, 1.3vw, 16px);
     line-height: 1.25;
     font-weight: 600;
-    transition: transform 0.6s var(--ease);
+    color: var(--tone);
+    animation: drift 6s ease-in-out infinite;
   }
-  .art:hover pre {
-    transform: scale(1.08) rotate(-1.5deg);
+  @keyframes drift {
+    50% {
+      transform: translateX(10px);
+    }
   }
-  h3 {
+  .title {
     margin: 0;
-    font-size: 14px;
-    font-weight: 500;
+    font-size: clamp(22px, 3vw, 34px);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--fg);
   }
-  p {
+  .cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 0.9em;
+    margin-left: 6px;
+    transform: translateY(0.1em);
+    background: var(--tone);
+    animation: blink 1.05s steps(1) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .sub {
     margin: 0;
     font-size: 13px;
     color: var(--muted);
-    max-width: 46ch;
-  }
-  .cta {
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--fg);
-    text-decoration: none;
-    margin-top: 4px;
-  }
-  .cta span {
-    display: inline-block;
-    transition: transform 0.2s var(--ease);
-  }
-  .cta:hover span {
-    transform: translate(2px, -2px);
   }
   @media (max-width: 640px) {
-    .items {
-      grid-template-columns: 1fr;
-      gap: 40px;
+    .soon {
+      min-height: 240px;
     }
-    pre {
-      font-size: 12px;
+    .art {
+      font-size: 8px;
     }
   }
 </style>

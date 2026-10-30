@@ -1,0 +1,108 @@
+---
+/**
+ * The ASCII starfield as a section backdrop. Drop it inside a section with the
+ * `has-starfield` class; it fills the section behind the content.
+ */
+interface Props {
+  /** Show the ships / warps counter in the top-right corner. */
+  stats?: boolean;
+  /** Small hint in the bottom-right corner. */
+  hint?: string;
+}
+const { stats = false, hint } = Astro.props;
+---
+
+<div class="starfield" data-starfield-root aria-hidden="true">
+  <canvas class="sky mono"></canvas>
+  {
+    stats && (
+      <div class="stats mono">
+        <div>
+          <span data-stat="ships">0</span> ships
+        </div>
+        <div>
+          <span data-stat="warps">0</span> warps
+        </div>
+      </div>
+    )
+  }
+  {hint && <p class="hint mono">{hint}</p>}
+</div>
+
+<style>
+  .starfield {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .sky {
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+  }
+  .stats {
+    position: absolute;
+    top: 24px;
+    right: var(--gutter);
+    font-size: 11px;
+    line-height: 1.7;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--faint);
+    pointer-events: none;
+  }
+  [data-stat="warps"].flash {
+    color: var(--accent);
+  }
+  .hint {
+    position: absolute;
+    right: var(--gutter);
+    bottom: 24px;
+    margin: 0;
+    font-size: 11px;
+    color: var(--faint);
+    pointer-events: none;
+  }
+  /* `clip`, not `hidden`, so sticky asides inside the section keep sticking. */
+  :global(.has-starfield) {
+    position: relative;
+    overflow: clip;
+    isolation: isolate;
+  }
+  /* A soft halo in the page colour keeps text crisp over stars and passing ships. */
+  :global(.has-starfield :is(h2, h3, p, span, button, a)) {
+    text-shadow:
+      0 0 3px var(--bg),
+      0 0 8px var(--bg),
+      0 0 14px var(--bg);
+  }
+  :global(.has-starfield .section-blurb) {
+    color: color-mix(in srgb, var(--fg) 80%, transparent);
+    font-weight: 500;
+  }
+</style>
+
+<script>
+  import { Starfield } from "../lib/starfield/engine";
+
+  // One engine per section that includes a starfield.
+  for (const root of document.querySelectorAll<HTMLElement>("[data-starfield-root]")) {
+    const canvas = root.querySelector("canvas")!;
+    const ships = root.querySelector<HTMLElement>('[data-stat="ships"]');
+    const warps = root.querySelector<HTMLElement>('[data-stat="warps"]');
+    let lastWarps = 0;
+    const field = new Starfield(canvas, (s) => {
+      if (!ships || !warps) return;
+      ships.textContent = String(s.ships);
+      warps.textContent = String(s.warps);
+      // Flash the warp count when it changes, tying the click to the number.
+      if (s.warps !== lastWarps) {
+        lastWarps = s.warps;
+        warps.classList.add("flash");
+        setTimeout(() => warps.classList.remove("flash"), 500);
+      }
+    });
+    window.addEventListener("themechange", () => field.readPalette());
+  }
+</script>
