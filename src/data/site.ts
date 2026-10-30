@@ -10,7 +10,7 @@ export const site = {
   email: "semiloreomotade@gmail.com",
   location: "Lagos, Nigeria",
   // Typed out in the hero, one string per line.
-  quote: ["the universe is mostly empty space;", "ship something worth the light"],
+  quote: ["the universe is mostly empty space;", "make something worth putting into it."],
 };
 
 export const socials = [
@@ -25,16 +25,19 @@ export type Link = { label: string; href?: string };
 /** The "who I am" paragraphs under the hero. Links render inline and underlined. */
 export const bio: (string | Link)[][] = [
   [
-    "Hi, I'm Semilore. I build + engineer ",
-    { label: "products, systems, tools", href: "#work" },
-    " and the occasional ",
-    { label: "wacky project", href: "#playground" },
-    ". I've spent the past 2 years turning complex ideas into things that actually work, feel seamless and are fast.",
+    "Hi, I'm Semilore. I'm a builder and engineer who turns ambitious ideas into ",
+    { label: "products, tools and systems", href: "#work" },
+    " that work, feel intuitive and run fast.",
   ],
   [
-    "I like performance, good design, ambitious teams and projects, and building software people actually enjoy using. I've built at fintechs, startups, side projects and communities. This site is my ",
+    "I'm drawn to great design, performance and people who aren't afraid to build differently. I've built across fintech, startups, independent projects and communities.",
+  ],
+  [
+    "This site is my little corner of the internet: things I've built, ",
+    { label: "ideas I've explored", href: "#blog" },
+    " and lessons I've picked up along the way. Think of it as my ",
     { label: "digital archive", href: "#archive" },
-    ", I hope you like it here.",
+    ". Glad you found your way here.",
   ],
 ];
 
