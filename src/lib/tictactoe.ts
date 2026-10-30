@@ -1,6 +1,6 @@
 /**
- * Tic-tac-toe against the site. The bot plays perfectly most of the time and
- * slips occasionally, so a win is possible but earned.
+ * Tic-tac-toe against the site. The bot plays perfect minimax, so the best
+ * anyone can do is a draw.
  */
 
 type Cell = "X" | "O" | null;
@@ -15,8 +15,6 @@ const LINES = [
   [0, 4, 8],
   [2, 4, 6],
 ];
-
-const SLIP_CHANCE = 0.22;
 
 function winner(b: Cell[]): { mark: Cell; line: number[] } | null {
   for (const line of LINES) {
@@ -43,7 +41,6 @@ function minimax(b: Cell[], turn: "X" | "O", depth: number): number {
 
 function botMove(b: Cell[]): number {
   const open = b.map((c, i) => (c ? -1 : i)).filter((i) => i >= 0);
-  if (Math.random() < SLIP_CHANCE) return open[(Math.random() * open.length) | 0];
   let best = -Infinity;
   let moves: number[] = [];
   for (const i of open) {
