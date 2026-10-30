@@ -195,10 +195,17 @@ import Starfield from "./Starfield.astro";
       grid-template-columns: 1fr auto;
       row-gap: 2px;
     }
+    /* Phones: the company sits beside the name instead of the year. */
     .what {
       grid-row: 2;
+      grid-column: 1 / -1;
     }
     .where {
+      grid-row: 1;
+      grid-column: 2;
+      text-align: right;
+    }
+    .year {
       display: none;
     }
   }

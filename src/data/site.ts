@@ -137,7 +137,7 @@ export const writing = {
   name: "defcon1",
   href: "https://memoirofsemilore.substack.com",
   blurb:
-    "I write about engineering and art on defcon1, including a year-long series where I learn one electronic component a week and explain it in my own words.",
+    "I write about engineering, art and everything in between I find interesting.",
   posts: [
     {
       title: "You shall not pass!!!; Diodes",
