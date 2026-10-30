@@ -1,0 +1,186 @@
+---
+import { archive, archiveTags } from "../data/site";
+---
+
+<section class="section" id="archive" style="--dot: var(--blue)">
+  <aside class="section-aside archive-aside">
+    <div class="head">
+      <h2 class="section-label">The Archives</h2>
+      <p class="section-blurb">
+        A running log of things I've built and run over the years. Some big, some tiny, some that made more sense at
+        2am.
+      </p>
+    </div>
+    <div class="tags" role="group" aria-label="Filter archive by tag">
+      <p class="tags-label">Tags</p>
+      <button type="button" class="tag" data-tag="all" aria-pressed="true">All</button>
+      {
+        archiveTags.map((t) => (
+          <button type="button" class="tag" data-tag={t} aria-pressed="false">
+            {t}
+          </button>
+        ))
+      }
+    </div>
+  </aside>
+
+  <ul class="rows">
+    {
+      archive.map((a) => {
+        const Tag = a.href ? "a" : "div";
+        return (
+          <li data-tags={a.tags.join(",")}>
+            <Tag
+              class="row"
+              href={a.href}
+              target={a.href ? "_blank" : undefined}
+              rel={a.href ? "noopener noreferrer" : undefined}
+            >
+              <span class="name">{a.name}</span>
+              <span class="what">{a.what}</span>
+              <span class="where">{a.where}</span>
+              <span class="year mono">
+                {a.year}
+                {a.href && <span class="arrow">↗</span>}
+              </span>
+            </Tag>
+          </li>
+        );
+      })
+    }
+  </ul>
+</section>
+
+<style>
+  .archive-aside {
+    min-height: min(560px, calc(100vh - 140px));
+    justify-content: space-between;
+  }
+  .head {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .tags {
+    display: flex;
+    flex-direction: column;
+  }
+  .tags-label {
+    margin: 0 0 12px;
+    font-size: 13px;
+  }
+  .tag {
+    font: inherit;
+    font-size: 12px;
+    text-align: left;
+    background: none;
+    border: 0;
+    border-top: 1px solid var(--line);
+    padding: 9px 0;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .tag:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  .tag:hover {
+    color: var(--fg);
+  }
+  .tag[aria-pressed="true"] {
+    color: var(--fg);
+  }
+  .tag[aria-pressed="true"]::before {
+    content: "● ";
+    color: var(--blue);
+    font-size: 9px;
+    vertical-align: 1px;
+  }
+  .rows {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  li {
+    border-top: 1px solid var(--line);
+  }
+  li:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+  li.hidden {
+    display: none;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 1.1fr 1.4fr 1fr 70px;
+    gap: 16px;
+    align-items: center;
+    padding: 16px 4px;
+    font-size: 13px;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color 0.2s, padding 0.3s var(--ease);
+  }
+  a.row:hover,
+  a.row:focus-visible {
+    background: var(--card);
+    padding-left: 12px;
+    outline: none;
+  }
+  .what,
+  .where {
+    color: var(--muted);
+  }
+  .year {
+    font-size: 11px;
+    color: var(--faint);
+    text-align: right;
+  }
+  .arrow {
+    margin-left: 6px;
+  }
+  @media (max-width: 860px) {
+    .archive-aside {
+      min-height: 0;
+      gap: 24px;
+    }
+    .tags {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .tags-label {
+      display: none;
+    }
+    .tag,
+    .tag:last-child {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 12px;
+    }
+  }
+  @media (max-width: 640px) {
+    .row {
+      grid-template-columns: 1fr auto;
+      row-gap: 2px;
+    }
+    .what {
+      grid-row: 2;
+    }
+    .where {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const buttons = [...document.querySelectorAll<HTMLButtonElement>("#archive [data-tag]")];
+  const rows = [...document.querySelectorAll<HTMLElement>("#archive li[data-tags]")];
+  buttons.forEach((btn) =>
+    btn.addEventListener("click", () => {
+      const tag = btn.dataset.tag!;
+      buttons.forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+      rows.forEach((r) => r.classList.toggle("hidden", tag !== "all" && !r.dataset.tags!.split(",").includes(tag)));
+    }),
+  );
+</script>

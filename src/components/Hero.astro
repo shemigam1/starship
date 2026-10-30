@@ -1,0 +1,209 @@
+---
+import { bio, site, socials } from "../data/site";
+---
+
+<header class="hero" id="top">
+  <canvas class="sky mono" data-starfield aria-hidden="true"></canvas>
+  <div class="shade" aria-hidden="true"></div>
+
+  <div class="stats mono" aria-hidden="true">
+    <div><span data-stat="ships">0</span> ships</div>
+    <div><span data-stat="warps">0</span> warps</div>
+  </div>
+
+  <div class="copy">
+    <blockquote class="quote mono" aria-label={site.quote.join(" ")}>
+      <span data-typed aria-hidden="true"></span><span class="cursor" aria-hidden="true"></span>
+    </blockquote>
+
+    <div class="bio mono">
+      {
+        bio.map((line) => (
+          <p>
+            {line.map((part) =>
+              typeof part === "string" ? (
+                part
+              ) : part.href ? (
+                <a class="link" href={part.href} target="_blank" rel="noopener noreferrer">
+                  {part.label}
+                </a>
+              ) : (
+                part.label
+              ),
+            )}
+          </p>
+        ))
+      }
+    </div>
+
+    <p class="socials mono">
+      {
+        socials.map((s, i) => (
+          <>
+            {i > 0 && <span class="sep"> / </span>}
+            <a class="link" href={s.href} target={s.href.startsWith("http") ? "_blank" : undefined} rel="noopener noreferrer">
+              {s.label}
+            </a>
+          </>
+        ))
+      }
+    </p>
+  </div>
+
+  <p class="hint mono" aria-hidden="true">click anywhere in the sky to warp</p>
+</header>
+
+<style>
+  .hero {
+    position: relative;
+    height: 100svh;
+    min-height: 560px;
+    overflow: hidden;
+  }
+  .sky {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    cursor: crosshair;
+  }
+  /* Keeps the copy legible where ships pass behind it. */
+  .shade {
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 55%;
+    pointer-events: none;
+    background: linear-gradient(to top, var(--bg) 8%, color-mix(in srgb, var(--bg) 70%, transparent) 45%, transparent);
+  }
+  .stats {
+    position: absolute;
+    top: 72px;
+    right: var(--gutter);
+    font-size: 11px;
+    line-height: 1.7;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--faint);
+    pointer-events: none;
+  }
+  [data-stat="warps"].flash {
+    color: var(--accent);
+  }
+  .copy {
+    position: absolute;
+    left: clamp(var(--gutter), 11vw, 180px);
+    right: var(--gutter);
+    bottom: clamp(48px, 12vh, 128px);
+    display: flex;
+    flex-direction: column;
+    gap: 36px;
+    max-width: 700px;
+    pointer-events: none;
+  }
+  .copy a {
+    pointer-events: auto;
+  }
+  .quote {
+    margin: 0;
+    min-height: 3.4em;
+    font-size: 14px;
+    line-height: 1.7;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    white-space: pre-line;
+  }
+  .cursor {
+    display: inline-block;
+    width: 0.55em;
+    height: 1em;
+    margin-left: 4px;
+    transform: translateY(0.15em);
+    background: var(--fg);
+    animation: blink 1.05s steps(1) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .bio {
+    font-size: 14px;
+    line-height: 1.75;
+  }
+  .bio p {
+    margin: 0;
+  }
+  .socials {
+    margin: 0;
+    font-size: 13px;
+  }
+  .socials a {
+    opacity: 0.6;
+  }
+  .socials a:hover {
+    opacity: 1;
+  }
+  .sep {
+    opacity: 0.4;
+  }
+  .hint {
+    position: absolute;
+    right: var(--gutter);
+    bottom: 24px;
+    margin: 0;
+    font-size: 11px;
+    color: var(--faint);
+    pointer-events: none;
+  }
+  @media (max-width: 760px) {
+    .copy {
+      bottom: 64px;
+      gap: 24px;
+    }
+    .bio,
+    .quote {
+      font-size: 13px;
+    }
+    .hint {
+      left: var(--gutter);
+      right: auto;
+    }
+  }
+</style>
+
+<script>
+  import { Starfield } from "../lib/starfield/engine";
+  import { site } from "../data/site";
+
+  const canvas = document.querySelector<HTMLCanvasElement>("[data-starfield]")!;
+  const ships = document.querySelector<HTMLElement>('[data-stat="ships"]')!;
+  const warps = document.querySelector<HTMLElement>('[data-stat="warps"]')!;
+  let lastWarps = 0;
+
+  const field = new Starfield(canvas, (s) => {
+    ships.textContent = String(s.ships);
+    warps.textContent = String(s.warps);
+    // Flash the warp count when it changes, tying the click to the number.
+    if (s.warps !== lastWarps) {
+      lastWarps = s.warps;
+      warps.classList.add("flash");
+      setTimeout(() => warps.classList.remove("flash"), 500);
+    }
+  });
+  window.addEventListener("themechange", () => field.readPalette());
+
+  // Typewriter for the quote.
+  const typed = document.querySelector<HTMLElement>("[data-typed]")!;
+  const text = site.quote.join("\n");
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    typed.textContent = text;
+  } else {
+    let i = 0;
+    const type = () => {
+      typed.textContent = text.slice(0, ++i);
+      if (i < text.length) setTimeout(type, text[i - 1] === "\n" ? 420 : 38 + Math.random() * 50);
+    };
+    setTimeout(type, 600);
+  }
+</script>

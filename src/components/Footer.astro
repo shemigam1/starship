@@ -1,0 +1,191 @@
+---
+import { badges, site } from "../data/site";
+const year = new Date().getFullYear();
+---
+
+<footer class="footer" id="arcade">
+  <div class="arcade">
+    <div class="stage" data-nudge>
+      <p class="label mono">Give the logos a nudge.</p>
+      {
+        badges.map((b) => (
+          <span class="badge mono" data-badge style={`background:${b.bg};color:${b.fg}`}>
+            {b.label}
+          </span>
+        ))
+      }
+    </div>
+
+    <div class="ttt" data-ttt data-bot={site.short}>
+      <p class="score mono">
+        You <span data-score-you>0</span> — <span data-score-bot>0</span>{" "}{site.short.toUpperCase()}
+      </p>
+      <div class="board" role="grid" aria-label="Tic-tac-toe board">
+        {Array.from({ length: 9 }, (_, i) => <button type="button" class="cell mono" data-cell aria-label={`Square ${i + 1}`} />)}
+      </div>
+      <p class="status mono" data-status aria-live="polite"></p>
+    </div>
+  </div>
+
+  <div class="credits">
+    <span>© {year}</span>
+    <span class="muted">— built in {site.location.split(",")[0]} with jollof, caffeine and tokens :)</span>
+  </div>
+
+  <a class="email" href={`mailto:${site.email}`} style={`--chars: ${site.email.length}`}>{site.email}</a>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .arcade {
+    display: grid;
+    grid-template-columns: 1fr minmax(300px, 30%);
+    border-bottom: 1px solid var(--line);
+  }
+  .stage {
+    position: relative;
+    height: 340px;
+    overflow: hidden;
+    touch-action: none;
+    user-select: none;
+  }
+  .label {
+    position: absolute;
+    top: 20px;
+    left: var(--gutter);
+    margin: 0;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .badge {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    font-size: 17px;
+    cursor: grab;
+    box-shadow:
+      inset 0 -6px 0 rgba(0, 0, 0, 0.18),
+      0 6px 16px rgba(0, 0, 0, 0.25);
+    will-change: transform;
+  }
+  .badge:active {
+    cursor: grabbing;
+  }
+  .ttt {
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid var(--line);
+  }
+  .score {
+    margin: 0;
+    padding: 14px;
+    text-align: center;
+    font-size: 12px;
+    border-bottom: 1px solid var(--line);
+    font-variant-numeric: tabular-nums;
+  }
+  .board {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+  }
+  .cell {
+    min-height: 68px;
+    background: none;
+    border: 0;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    color: var(--fg);
+    font-size: 26px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s;
+  }
+  .cell:nth-child(3n) {
+    border-right: 0;
+  }
+  .cell:enabled:hover {
+    background: var(--card);
+  }
+  .cell:disabled {
+    cursor: default;
+  }
+  .cell[data-mark="O"] {
+    color: var(--accent);
+  }
+  .cell.win {
+    background: color-mix(in srgb, var(--accent) 16%, transparent);
+  }
+  .status {
+    margin: 0;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .credits {
+    display: flex;
+    gap: 8px;
+    padding: 14px var(--gutter);
+    font-size: 12px;
+    border-bottom: 1px solid var(--line);
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .email {
+    display: block;
+    padding: 0 var(--gutter);
+    /* Sized from the address length so it always spans the page in one line. */
+    font-size: min(140px, calc((100vw - 2 * var(--gutter)) / (var(--chars) * 0.53)));
+    font-weight: 500;
+    letter-spacing: -0.045em;
+    line-height: 1.15;
+    white-space: nowrap;
+    color: color-mix(in srgb, var(--fg) 42%, transparent);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+  .email:hover,
+  .email:focus-visible {
+    color: var(--fg);
+    outline: none;
+  }
+  @media (max-width: 760px) {
+    .arcade {
+      grid-template-columns: 1fr;
+    }
+    .ttt {
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .stage {
+      height: 280px;
+    }
+    .badge {
+      width: 56px;
+      height: 56px;
+      font-size: 14px;
+    }
+    .credits {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+</style>
+
+<script>
+  import { mountNudge } from "../lib/nudge";
+  import { mountTicTacToe } from "../lib/tictactoe";
+  mountNudge(document.querySelector<HTMLElement>("[data-nudge]")!);
+  mountTicTacToe(document.querySelector<HTMLElement>("[data-ttt]")!);
+</script>
