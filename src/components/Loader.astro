@@ -1,0 +1,121 @@
+---
+/**
+ * First-visit loading screen: an asteroid takes out an ASCII planet, then the
+ * page is revealed. Plays once per session; click or press a key to skip.
+ */
+---
+
+<div class="loader" data-loader role="status" aria-label="Loading">
+  <canvas class="mono" data-loader-canvas aria-hidden="true"></canvas>
+  <p class="caption mono" data-loader-caption aria-hidden="true"></p>
+  <p class="skip mono" aria-hidden="true">click to skip</p>
+</div>
+<noscript><style>.loader{display:none!important}</style></noscript>
+
+<script is:inline>
+  // Decide before first paint whether the loader plays, so returning visitors never see it.
+  (() => {
+    const el = document.querySelector("[data-loader]");
+    let seen = false;
+    try {
+      seen = sessionStorage.getItem("loader-seen") === "1";
+    } catch {}
+    if (seen || matchMedia("(prefers-reduced-motion: reduce)").matches) el.remove();
+    else document.documentElement.classList.add("is-loading");
+  })();
+</script>
+
+<style>
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    background: var(--bg);
+    cursor: pointer;
+    transition:
+      opacity 0.6s var(--ease),
+      visibility 0.6s;
+  }
+  .loader.done {
+    opacity: 0;
+    visibility: hidden;
+  }
+  .caption {
+    min-height: 1.6em;
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .caption::after {
+    content: "▍";
+    color: var(--accent);
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .skip {
+    position: absolute;
+    bottom: 24px;
+    margin: 0;
+    font-size: 11px;
+    color: var(--faint);
+  }
+  :global(html.is-loading) {
+    overflow: hidden;
+  }
+</style>
+
+<script>
+  import { DURATION, Doomsday } from "../lib/doomsday";
+
+  const el = document.querySelector<HTMLElement>("[data-loader]");
+  if (el) {
+    const canvas = el.querySelector<HTMLCanvasElement>("[data-loader-canvas]")!;
+    const caption = el.querySelector<HTMLElement>("[data-loader-caption]")!;
+    const css = getComputedStyle(document.documentElement);
+    const color = (name: string) => css.getPropertyValue(name).trim();
+    const anim = new Doomsday(
+      canvas,
+      caption,
+      { fg: color("--fg"), accent: color("--accent"), muted: color("--muted") },
+      getComputedStyle(canvas).fontFamily,
+    );
+
+    let raf = 0;
+    let finished = false;
+    const start = performance.now();
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      cancelAnimationFrame(raf);
+      try {
+        sessionStorage.setItem("loader-seen", "1");
+      } catch {}
+      el.classList.add("done");
+      document.documentElement.classList.remove("is-loading");
+      setTimeout(() => el.remove(), 700);
+    };
+
+    const tick = (now: number) => {
+      const t = (now - start) / 1000;
+      anim.frame(t);
+      if (t >= DURATION) finish();
+      else raf = requestAnimationFrame(tick);
+    };
+
+    // Wait for the mono font so the first frame draws in it.
+    document.fonts.ready.then(() => (raf = requestAnimationFrame(tick)));
+    window.addEventListener("resize", () => anim.resize());
+    el.addEventListener("click", finish);
+    window.addEventListener("keydown", finish, { once: true });
+  }
+</script>
